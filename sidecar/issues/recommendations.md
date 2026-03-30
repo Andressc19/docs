@@ -7,7 +7,7 @@
 
 ## Prioridad Alta
 
-### Issue 1: Implementar Layer 0.5 - Metadata Nativa como Shortcut
+### ✔️ Issue 1: Implementar Layer 0.5 - Metadata Nativa como Shortcut
 
 **Descripción:**
 Agregar una capa entre Layer 0 (hash) y Layer 1 que extraiga metadata nativa del archivo (EXIF, ID3, PDF props) y haga shortcut si la confianza es alta (>0.8).
@@ -33,10 +33,11 @@ Agregar una capa entre Layer 0 (hash) y Layer 1 que extraiga metadata nativa del
 **Threshold:** Si score > 0.8 → skip Layers 1-4
 
 **Estimación:** 3-5 días de implementación
+**Comentarios** Utilizar Exiftool para obtener metadatos y luego filtrarlos por tipo de archivo (PDF, IMG, AUDIO)
 
 ---
 
-### Issue 2: Migrar storage a ubicación centralizada
+### ❌ Issue 2: Migrar storage a ubicación centralizada
 
 **Descripción:**
 Centralizar todos los datos en `~/.sidecar-tagger/` en lugar de generar `sidecar.json` en cada carpeta.
@@ -61,11 +62,14 @@ Centralizar todos los datos en `~/.sidecar-tagger/` en lugar de generar `sidecar
 
 **Estimación:** 2-3 días
 
+**Comentarios** Revisar la discusion de redundancia de SVN
+
+
 ---
 
 ## Prioridad Media
 
-### Issue 3: Agregar soporte audio/video
+### ✔️ Issue 3: Agregar soporte audio/video
 
 **Descripción:**
 Extender parsers para soportar formatos de audio y video, integrando con Layer 0.5.
@@ -80,9 +84,12 @@ Extender parsers para soportar formatos de audio y video, integrando con Layer 0
 
 **Estimación:** 2 días
 
+**Comentarios** La metadata puede no ser confiable para el layer 0.5
+
+
 ---
 
-### Issue 4: Optimizar sampling para archivos grandes
+### ⚠️ Issue 4: Optimizar sampling para archivos grandes
 
 **Descripción:**
 Limitar la cantidad de contenido enviado al LLM para archivos grandes.
@@ -98,7 +105,7 @@ Limitar la cantidad de contenido enviado al LLM para archivos grandes.
 
 ---
 
-### Issue 5: Sistema de métricas y reporter
+### ✔️ Issue 5: Sistema de métricas y reporter
 
 **Descripción:**
 Agregar tracking de qué layers resuelven cada archivo y generar reporte post-proceso.
