@@ -51,7 +51,7 @@ Permitir configurar el nivel de análisis según el caso de uso: desde análisis
 ✗ Layer 4: LLM
 ```
 
-**Caso de uso:**快速escaneo, metadata básica.
+**Caso de uso:** escaneo, metadata básica.
 
 ---
 
