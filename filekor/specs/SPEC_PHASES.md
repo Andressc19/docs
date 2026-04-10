@@ -1,113 +1,113 @@
-# SPEC: Fases de Desarrollo
+# SPEC: Development Phases
 
-**Documento:** Plan de construcción por fases para testing incremental  
-**Referencia:** INIT_SPEC.md sección 8
-
----
-
-## Principio General
-
-> Construir capa por capa, no agregar complejidad antes de tiempo. Cada fase debe ser testeable independientemente.
+**Document:** Phased construction plan for incremental testing  
+**Reference:** INIT_SPEC.md section 8
 
 ---
 
-## Phase 0 — Fundamentos (Testeable)
+## General Principle
 
-**Objetivo:** Crear estructura base + Layer 0 + Layer 1 mock
+> Build layer by layer, don't add complexity before its time. Each phase must be testable independently.
 
-### Duración estimada: 1-2 días
+---
 
-### Entregables:
+## Phase 0 — Fundamentals (Testable)
 
-- [ ] Estructura del proyecto (poetry/pyproject.toml)
+**Objective:** Create base structure + Layer 0 + Layer 1 mock
+
+### Estimated duration: 1-2 days
+
+### Deliverables:
+
+- [ ] Project structure (poetry/pyproject.toml)
 - [ ] Layer 0: Hash + cache check (stdlib only)
 - [ ] Layer 1 Adapter interface
-- [ ] MockMetadataAdapter (datos realistas)
-- [ ] Tests unitarios para L0 y L1
-- [ ] CLI básica funcional
+- [ ] MockMetadataAdapter (realistic data)
+- [ ] Unit tests for L0 and L1
+- [ ] Basic functional CLI
 - [ ] Sidecar schema v1
 
-### Costo: $0
+### Cost: $0
 
-### Criterio de exit: Tests pasan sin dependencias externas
-
----
-
-## Phase 1 — Metadata Real
-
-**Objetivo:** Integrar PyExifTool real
-
-### Duración estimada: 2-3 días
-
-### Entregables:
-
-- [ ] PyExifTool real integration
-- [ ] Tests de integración L0 + L1
-- [ ] Sidecar generation funcional
-- [ ] Caché incremental (hash comparison)
-- [ ] CLI completa para extract/preview/labels/sidecar
-
-### Costo: $0
-
-### Criterio de exit: Puedo procesar PDFs reales y generar sidecars
+### Exit criterion: Tests pass without external dependencies
 
 ---
 
-## Phase 2 — Embeddings (Opcional)
+## Phase 1 — Real Metadata
 
-**Objetivo:** Agregar similarity search
+**Objective:** Integrate real PyExifTool
 
-### Duración estimada: 1-2 días
+### Estimated duration: 2-3 days
 
-### Entregables:
+### Deliverables:
+
+- [ ] Real PyExifTool integration
+- [ ] Integration tests L0 + L1
+- [ ] Functional sidecar generation
+- [ ] Incremental cache (hash comparison)
+- [ ] Complete CLI for extract/preview/labels/sidecar
+
+### Cost: $0
+
+### Exit criterion: I can process real PDFs and generate sidecars
+
+---
+
+## Phase 2 — Embeddings (Optional)
+
+**Objective:** Add similarity search
+
+### Estimated duration: 1-2 days
+
+### Deliverables:
 
 - [ ] EmbeddingsAdapter interface
 - [ ] MockEmbeddingsImpl (tests)
-- [ ] SentenceTransformersImpl o FastEmbedImpl
-- [ ] Tests de similarity check
-- [ ] Integración con cache
+- [ ] SentenceTransformersImpl or FastEmbedImpl
+- [ ] Similarity check tests
+- [ ] Cache integration
 
-### Costo: $0
+### Cost: $0
 
-### Criterio de exit: Puedo encontrar archivos similares por contenido
+### Exit criterion: I can find similar files by content
 
 ---
 
 ## Phase 3 — LLM (Plus)
 
-**Objetivo:** Análisis semántico completo
+**Objective:** Complete semantic analysis
 
-### Duración estimada: 2-3 días
+### Estimated duration: 2-3 days
 
-### Entregables:
+### Deliverables:
 
 - [ ] LLMAdapter interface
 - [ ] MockLLMImpl (tests)
 - [ ] GeminiImpl
 - [ ] OllamaImpl
-- [ ] Confidence threshold configurable
-- [ ] Tests de prompts
+- [ ] Configurable confidence threshold
+- [ ] Prompt tests
 
-### Costo: ~$0 (Gemini free tier) o $0 (Ollama local)
+### Cost: ~$0 (Gemini free tier) or $0 (Ollama local)
 
-### Criterio de exit: Puedo generar summaries largos y labels con alta confianza
-
----
-
-## Resumen de Fases
-
-| Fase | Capas | Duración | Costo | Valor |
-|------|-------|----------|-------|-------|
-| **Phase 0** | L0 + L1 mock | 1-2 días | $0 | MVP funcional sin IA |
-| **Phase 1** | L1 real | 2-3 días | $0 | Metadata extraction real |
-| **Phase 2** | L2 | 1-2 días | $0 | Similarity search |
-| **Phase 3** | L3 | 2-3 días | ~$0 | LLM + deep analysis |
-
-**Total:** ~6-10 días para producto completo
+### Exit criterion: I can generate long summaries and labels with high confidence
 
 ---
 
-## Estructura de Tests
+## Phases Summary
+
+| Phase | Layers | Duration | Cost | Value |
+|-------|--------|----------|------|-------|
+| **Phase 0** | L0 + L1 mock | 1-2 days | $0 | Functional MVP without AI |
+| **Phase 1** | L1 real | 2-3 days | $0 | Real metadata extraction |
+| **Phase 2** | L2 | 1-2 days | $0 | Similarity search |
+| **Phase 3** | L3 | 2-3 days | ~$0 | LLM + deep analysis |
+
+**Total:** ~6-10 days for complete product
+
+---
+
+## Test Structure
 
 ```
 tests/
@@ -126,16 +126,16 @@ tests/
 
 ---
 
-## Checklist de Criterio de Exit
+## Exit Criteria Checklist
 
 ### Phase 0
 
 ```python
 def test_phase_0_exit():
-    # Sin API keys, sin dependencias externas
+    # No API keys, no external dependencies
     processor = MetadataProcessor(MockAdapter())
     
-    # Procesa archivo y genera sidecar válido
+    # Process file and generate valid sidecar
     result = processor.process("tests/fixtures/sample.pdf")
     
     assert result.layers_used == ["0", "1"]
@@ -147,10 +147,10 @@ def test_phase_0_exit():
 
 ```python
 def test_phase_1_exit():
-    # Con PyExifTool real
+    # With real PyExifTool
     processor = MetadataProcessor(PyExifToolAdapter())
     
-    # Procesa PDF real
+    # Process real PDF
     result = processor.process("real_document.pdf")
     
     assert result.metadata.author is not None
@@ -161,19 +161,19 @@ def test_phase_1_exit():
 
 ## Rollback Plan
 
-Si una fase falla en completar:
+If a phase fails to complete:
 
-| Fase | Fallback |
-|------|----------|
-| Phase 0 | Reposicionar como "spec + mocks" |
-| Phase 1 | Mantener con mocks |
-| Phase 2 | Omitir, usar solo L0+L1 |
-| Phase 3 | Omitir, usar confidence de L1 |
+| Phase | Fallback |
+|-------|----------|
+| Phase 0 | Reposition as "spec + mocks" |
+| Phase 1 | Keep with mocks |
+| Phase 2 | Skip, use only L0+L1 |
+| Phase 3 | Skip, use L1 confidence |
 
 ---
 
-## Notas
+## Notes
 
-- Cada fase debe mergearse a main independently
-- Usar feature flags para activar/desactivar capas
-- Documentar decisiones de cada fase
+- Each phase should be merged to main independently
+- Use feature flags to enable/disable layers
+- Document decisions from each phase

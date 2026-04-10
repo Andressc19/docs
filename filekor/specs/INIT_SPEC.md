@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Date:** April 2026  
-**Author:** Andres Camperos
+**Author:** Andres Camperos  
 **Document Type:** Project Specification  
 **Status:** Pre-Development (Phase 0)
 
@@ -10,20 +10,20 @@
 
 ## 1. Product Definition
 
-**fileKor** es un motor de metadatos local que extrae, resume, clasifica y etiqueta archivos — consumido como librería (PyPI) o usado como CLI.
+**fileKor** is a local metadata engine that extracts, summarizes, classifies, and tags files — consumed as a library (PyPI) or used as a CLI.
 
-| Modo | Descripción |
+| Mode | Description |
 |------|-------------|
-| **PyPI** | Se importa como módulo Python |
-| **CLI** | Se ejecuta desde terminal |
+| **PyPI** | Imported as a Python module |
+| **CLI** | Executed from terminal |
 
-**fileKor NO es:** TUI completa, motor de búsqueda, sistema de indexación central, servicio cloud.
+**fileKor is NOT:** Complete TUI, search engine, centralized indexing system, cloud service.
 
 ---
 
 ## 2. API Contract
 
-### Interfaz Principal
+### Main Interface
 
 ```python
 class MetadataEngine(ABC):
@@ -34,7 +34,7 @@ class MetadataEngine(ABC):
     def generate_sidecar(self, path: Path) -> SidecarFile: pass
 ```
 
-### DTOs Principales
+### Main DTOs
 
 ```python
 @dataclass
@@ -48,7 +48,7 @@ class ExtractedText:
 @dataclass
 class SummaryResult:
     summary: str
-    summary_type: SummaryType  # SHORT o LONG
+    summary_type: SummaryType  # SHORT or LONG
     key_points: List[str]
     entities: List[str]
     labels: List[str]
@@ -81,10 +81,10 @@ class SidecarFile:
     generated_by: str = "filekor"
 ```
 
-> Schema JSON detallado: ver [SPEC_SIDECAR.md](SPEC_SIDECAR.md)
+> Detailed JSON schema: see [SPEC_SIDECAR.md](SPEC_SIDECAR.md)
 
 ```python
-# DTOs internos para SidecarFile
+# Internal DTOs for SidecarFile
 @dataclass
 class FileInfo:
     path: str
@@ -131,145 +131,147 @@ class ParserStatus(Enum):
 
 ---
 
-## 3. Arquitectura
+## 3. Architecture
 
-### Patrón Adapter
+### Adapter Pattern
 
 ```
 fileKor Core
-       ↓
-   Adapter (interfaz común)
-       ↓
-   External Tool (pdfplumber, PyExifTool, embeddings, LLM)
+        ↓
+   Adapter (common interface)
+        ↓
+External Tool (pdfplumber, PyExifTool, embeddings, LLM)
 ```
 
-### Stack Tecnológico
+### Technology Stack
 
-| Paquete | Rol | License |
-|---------|-----|---------|
-| pdfplumber | Extracción texto PDFs | MIT |
-| PyExifTool | Extracción metadatos | GPL/BSD |
-| click | Framework CLI | BSD-3-Clause |
-| rich | Output formateado | MIT |
-| pydantic | Validación DTOs | MIT |
+| Package | Role | Version | Python Support | License |
+|---------|------|---------|----------------|---------|
+| python | Runtime | ^3.11 | - | - |
+| pdfplumber | PDF text extraction | ^0.11.0 | >=3.8 | MIT |
+| PyExifTool | Metadata extraction | ^0.6.0 | >=3.7 | GPL/BSD |
+| click | CLI framework | ^8.1.0 | >=3.7 | BSD-3-Clause |
+| rich | Formatted output | ^13.0.0 | >=3.7 | MIT |
+| pydantic | DTO validation | ^2.0.0 | >=3.7 | MIT |
+| pyyaml | Config parsing | ^6.0 | >=3.7 | MIT |
 
 ---
 
-## 4. Modelo de Capas
+## 4. Layer Model
 
-Ver documento completo: [SPEC_LAYERS.md](SPEC_LAYERS.md)
+See full document: [SPEC_LAYERS.md](SPEC_LAYERS.md)
 
-| Layer | Nombre | Descripción | Costo |
-|-------|--------|-------------|-------|
+| Layer | Name | Description | Cost |
+|-------|------|-------------|------|
 | **L0** | Hash Dedup | SHA256 cache check | $0 |
-| **L1** | Native + OS | Metadata nativa (exiftool) | $0 |
+| **L1** | Native + OS | Native metadata (exiftool) | $0 |
 | **L2** | Embeddings | Similarity check (adapter pattern) | $0 |
 | **L3** | LLM Prompt | Gemini + Ollama (adapter pattern) | $ |
 
-### Niveles de Análisis
+### Analysis Levels
 
-| Nivel | Capas | Costo | Precisión |
-|-------|-------|-------|-----------|
-| **minimal** | L0 | $0 | Baja |
-| **fast** | L0 + L1 | $0 | Media |
-| **standard** | L0 + L1 + L2 | $0 | Alta |
-| **deep** | Todas | $ | Muy Alta |
+| Level | Layers | Cost | Precision |
+|-------|--------|------|-----------|
+| **minimal** | L0 | $0 | Low |
+| **fast** | L0 + L1 | $0 | Medium |
+| **standard** | L0 + L1 + L2 | $0 | High |
+| **deep** | All | $ | Very High |
 
 ### Confidence Threshold
 
-- Hardcodeado en Phase 0 (ej: 0.8)
-- Configurable via `config.yaml` en fases posteriores
+- Hardcoded in Phase 0 (e.g: 0.8)
+- Configurable via `config.yaml` in later phases
 
 ---
 
 ## 5. Sidecar Schema
 
-Ver documento completo: [SPEC_SIDECAR.md](SPEC_SIDECAR.md)
+See full document: [SPEC_SIDECAR.md](SPEC_SIDECAR.md)
 
 ---
 
-## 6. Taxonomía de Labels
+## 6. Label Taxonomy
 
-Ver documento completo: [SPEC_TAXONOMY.md](SPEC_TAXONOMY.md)
+See full document: [SPEC_TAXONOMY.md](SPEC_TAXONOMY.md)
 
-- **Base predefinida:** `contract, finance, legal, provider, architecture, config, notes`
-- **Configurable:** Via archivo del consumidor
-
----
-
-## 7. Manejo de Errores
-
-| Parser Status | Significado |
-|---------------|-------------|
-| `OK` | Extraído correctamente |
-| `DEGRADED` | Encriptado o parcial — `"Needs OCR or password"` |
-| `BROKEN` | No se puede leer |
-
-**Filosofía:** No intentar descifrar, marcar y continuar.
+- **Predefined base:** `contract, finance, legal, provider, architecture, config, notes`
+- **Configurable:** Via consumer file
 
 ---
 
-## 8. Construcción por Fases
+## 7. Error Handling
 
-Ver documento completo: [SPEC_PHASES.md](SPEC_PHASES.md)
+| Parser Status | Meaning |
+|---------------|---------|
+| `OK` | Extracted correctly |
+| `DEGRADED` | Encrypted or partial — `"Needs OCR or password"` |
+| `BROKEN` | Cannot be read |
 
-### Phase 0 — Fundamentos (Testeable)
+**Philosophy:** Don't attempt to decrypt, mark and continue.
+
+---
+
+## 8. Construction by Phases
+
+See full document: [SPEC_PHASES.md](SPEC_PHASES.md)
+
+### Phase 0 — Fundamentals (Testable)
 - Layer 0: Hash + cache (stdlib)
 - Layer 1: Adapter + Mock
-- Tests unitarios
+- Unit tests
 
-### Phase 1 — Metadata Real
-- PyExifTool real
+### Phase 1 — Real Metadata
+- Real PyExifTool
 - Sidecar generation
-- Caché incremental
+- Incremental cache
 
-### Phase 2 — Embeddings 
+### Phase 2 — Embeddings
 - EmbeddingsAdapter interface
 - Mock + real implementation
 
-### Phase 3 — LLM 
+### Phase 3 — LLM
 - LLMAdapter interface
 - Gemini + Ollama implementations
 
 ---
 
-## 9. Principios de Desarrollo
+## 9. Development Principles
 
-- **Mock-first:** Construir contra interfaces
-- **Adapter pattern:** No acoplar a herramientas específicas
-- **Testeable:** Cada layer probable independientemente
-- **Local-only:** Sin cloud services
-- **Construcción por capas:** No agregar complejidad antes de tiempo
-
----
-
-## 10. Referencias
-
-| Documento | Propósito |
-|-----------|-----------|
-| [SPEC_LAYERS.md](SPEC_LAYERS.md) | Modelo de capas detallado |
-| [SPEC_SIDECAR.md](SPEC_SIDECAR.md) | Sidecar schema completo |
-| [SPEC_TAXONOMY.md](SPEC_TAXONOMY.md) | Taxonomía de labels |
-| [SPEC_PHASES.md](SPEC_PHASES.md) | Plan de construcción por fases |
-| [SPEC_CLI.md](SPEC_CLI.md) | Interface CLI detallada |
-| questions.md | Decisiones de diseño respondidas |
+- **Mock-first:** Build against interfaces
+- **Adapter pattern:** Don't couple to specific tools
+- **Testable:** Each layer testable independently
+- **Local-only:** No cloud services
+- **Layered construction:** Don't add complexity prematurely
 
 ---
 
-## 11. Decisiones Tomadas
+## 10. References
 
-| # | Decisión |
+| Document | Purpose |
+|----------|---------|
+| [SPEC_LAYERS.md](SPEC_LAYERS.md) | Detailed layer model |
+| [SPEC_SIDECAR.md](SPEC_SIDECAR.md) | Complete sidecar schema |
+| [SPEC_TAXONOMY.md](SPEC_TAXONOMY.md) | Label taxonomy |
+| [SPEC_PHASES.md](SPEC_PHASES.md) | Phase-based construction plan |
+| [SPEC_CLI.md](SPEC_CLI.md) | Detailed CLI interface |
+| questions.md | Answered design decisions |
+
+---
+
+## 11. Decisions Made
+
+| # | Decision |
 |---|----------|
-| D001 | pdfplumber para extracción de texto |
-| D002 | PyExifTool para metadatos |
-| D003 | Taxonomía híbrida (predefinida + configurable) |
-| D004 | Sidecars + caché para persistencia |
-| D005 | Extracción incremental con hash comparison |
-| D006 | Archivos encriptados → DEGRADED |
-| D007 | Modelo por capas para summaries |
-| D008 | CLI + PyPI como modos de consumo |
-| D009 | Layer 2 usa Adapter pattern (cualquier librería) |
-| D010 | Layer 3 usa Gemini + Ollama (Adapter pattern) |
-| D011 | Confidence threshold hardcodeado + configurable |
-| D012 | Sidecar schema deduce del FileRecord del consumidor |
-| D013 | Archivos de metadata se llaman `.kor` (ej: `archivo.kor`) |
+| D001 | pdfplumber for text extraction |
+| D002 | PyExifTool for metadata |
+| D003 | Hybrid taxonomy (predefined + configurable) |
+| D004 | Sidecars + cache for persistence |
+| D005 | Incremental extraction with hash comparison |
+| D006 | Encrypted files → DEGRADED |
+| D007 | Layered model for summaries |
+| D008 | CLI + PyPI as consumption modes |
+| D009 | Layer 2 uses Adapter pattern (any library) |
+| D010 | Layer 3 uses Gemini + Ollama (Adapter pattern) |
+| D011 | Confidence threshold hardcoded + configurable |
+| D012 | Sidecar schema derives from consumer's FileRecord |
+| D013 | Metadata files named `.kor` (e.g: `file.kor`) |

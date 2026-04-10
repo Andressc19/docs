@@ -1,83 +1,83 @@
-# SPEC: Taxonomía de Labels
+# SPEC: Label Taxonomy
 
-**Documento:** Sistema de etiquetas semánticas para clasificación de archivos  
-**Referencia:** INIT_SPEC.md sección 6
-
----
-
-## Enfoque: Híbrido
-
-| Aspecto | Definición |
-|---------|------------|
-| **Base predefinida** | Lista fija de labels para MVP |
-| **Configurable** | Consumidor puede extender via config |
+**Document:** Semantic tagging system for file classification  
+**Reference:** INIT_SPEC.md section 6
 
 ---
 
-## Labels Predefinidos (MVP)
+## Approach: Hybrid
+
+| Aspect | Definition |
+|--------|------------|
+| **Predefined base** | Fixed list of labels for MVP |
+| **Configurable** | Consumer can extend via config |
+
+---
+
+## Predefined Labels (MVP)
 
 ```python
 DEFAULT_LABELS = [
-    # Categorías de Negocio/Legal
-    "contract",      # Contratos, acuerdos, convenios
-    "legal",         # Documentos legales, cláusulas
-    "invoice",       # Facturas, recibos, pagos
-    "finance",       # Documentos financieros en general
+    # Business/Legal Categories
+    "contract",      # Contracts, agreements, conventions
+    "legal",         # Legal documents, clauses
+    "invoice",       # Invoices, receipts, payments
+    "finance",       # Financial documents in general
     
-    # Proveedores y externos
-    "provider",      # Documentos de proveedores, vendor docs
+    # Providers and External
+    "provider",      # Provider documents, vendor docs
     
-    # Documentación técnica
-    "architecture",  # Diagramas, specs técnicas, RFCs
-    "spec",          # Especificaciones formales
-    "config",        # Configuraciones, settings
+    # Technical Documentation
+    "architecture",  # Diagrams, technical specs, RFCs
+    "spec",          # Formal specifications
+    "config",        # Configurations, settings
     
-    # Estados de documento
-    "draft",         # Borradores, versiones preliminares
-    "notes",         # Notas, comentarios
-    "reference",     # Material de referencia
+    # Document States
+    "draft",         # Drafts, preliminary versions
+    "notes",         # Notes, comments
+    "reference",     # Reference material
     
-    # Utilidades
-    "temp",          # Temporales, basura
+    # Utilities
+    "temp",          # Temporary, trash
 ]
 ```
 
 ---
 
-## Grupos Semánticos
+## Semantic Groups
 
 ```
-Categorías de Negocio/Legal
+Business/Legal Categories
 ├── contract
 ├── legal
 ├── invoice
 └── finance
 
-Proveedores/Externos
+Providers/External
 └── provider
 
-Documentación Técnica
+Technical Documentation
 ├── architecture
 ├── spec
 └── config
 
-Estados de Documento
+Document States
 ├── draft
 ├── notes
 └── reference
 
-Utilidades
+Utilities
 └── temp
 ```
 
 ---
 
-## Ejemplo de Uso
+## Usage Example
 
-### Sugerencia de Labels
+### Label Suggestion
 
 ```python
-# Input: PDF de contrato con proveedor
+# Input: PDF contract with provider
 labels = suggest_labels("contrato-proveedor-2026.pdf")
 # Output:
 {
@@ -87,28 +87,28 @@ labels = suggest_labels("contrato-proveedor-2026.pdf")
         "provider": 0.85,
         "finance": 0.30
     },
-    "reasoning": "Document titled 'Acuerdo de Proveedores' contains contract terms..."
+    "reasoning": "Document titled 'Provider Agreement' contains contract terms..."
 }
 ```
 
-### Configuración del Consumidor
+### Consumer Configuration
 
 ```yaml
-# config.yaml del consumidor
+# consumer config.yaml
 filekor:
   labels:
     taxonomy: custom
     custom_labels:
-      - urgente
-      - para-revisar
-      - aprobado
-      - rechazado
+      - urgent
+      - to-review
+      - approved
+      - rejected
     confidence_threshold: 0.7
 ```
 
 ---
 
-## Estructura en Sidecar
+## Structure in Sidecar
 
 ```json
 {
@@ -127,11 +127,11 @@ filekor:
 
 ---
 
-## Algoritmo de Sugerencia
+## Suggestion Algorithm
 
 ### Layer 1 (Fast)
 
-Basado en keywords del filename y path:
+Based on filename and path keywords:
 
 ```python
 def suggest_from_path(file_path: Path) -> List[str]:
@@ -146,7 +146,7 @@ def suggest_from_path(file_path: Path) -> List[str]:
 
 ### Layer 3 (Deep)
 
-Analisis semántico con LLM:
+Semantic analysis with LLM:
 
 ```python
 def suggest_from_content(text: str, taxonomy: List[str]) -> LabelSuggestion:
@@ -155,7 +155,7 @@ def suggest_from_content(text: str, taxonomy: List[str]) -> LabelSuggestion:
     
     Taxonomy: {taxonomy}
     
-    Document: {text[:2000]}  # primeros 2000 chars
+    Document: {text[:2000]}  # first 2000 chars
     
     Return JSON with:
     - suggested_labels: list
@@ -168,32 +168,32 @@ def suggest_from_content(text: str, taxonomy: List[str]) -> LabelSuggestion:
 
 ## Confidence Scoring
 
-| Score Range | Significado | Acción |
-|------------|-------------|--------|
-| 0.9 - 1.0 | Muy seguro | Auto-assign |
-| 0.7 - 0.9 | Seguro | Sugerir strongly |
-| 0.5 - 0.7 | Posible | Sugerir weakly |
-| 0.0 - 0.5 | Improbable | No sugerir |
+| Score Range | Meaning | Action |
+|-------------|---------|--------|
+| 0.9 - 1.0 | Very sure | Auto-assign |
+| 0.7 - 0.9 | Sure | Strongly suggest |
+| 0.5 - 0.7 | Possible | Weakly suggest |
+| 0.0 - 0.5 | Improbable | Do not suggest |
 
 ---
 
-## Extensibilidad
+## Extensibility
 
-El consumidor puede:
+The consumer can:
 
-1. **Agregar labels custom** via config
-2. **Modificar thresholds** de confianza
-3. **Ignorar labels predefinidos** que no use
-4. **Crear grupos jerárquicos** propios
+1. **Add custom labels** via config
+2. **Modify confidence thresholds**
+3. **Ignore predefined labels** not used
+4. **Create hierarchical groups** of their own
 
 ```python
-# Ejemplo de config extendida
+# Example extended config
 {
   "labels": {
     "use_defaults": true,
-    "custom_labels": ["urgente", "reviewed"],
+    "custom_labels": ["urgent", "reviewed"],
     "custom_groups": {
-      "workflow": ["urgente", "reviewed", "archived"]
+      "workflow": ["urgent", "reviewed", "archived"]
     }
   }
 }

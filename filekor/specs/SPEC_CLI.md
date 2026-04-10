@@ -1,48 +1,48 @@
 # SPEC: CLI Interface
 
-**Documento:** Interface de línea de comandos para fileKor  
-**Referencia:** INIT_SPEC.md sección 2
+**Document:** Command-line interface for fileKor  
+**Reference:** INIT_SPEC.md section 2
 
 ---
 
-## Comandos Principales
+## Main Commands
 
-| Comando | Descripción |
-|--------|-------------|
-| `filekor extract <path>` | Extrae texto del archivo |
-| `filekor summarize <path>` | Genera resumen (short por defecto) |
-| `filekor labels <path>` | Propone etiquetas |
-| `filekor preview <path>` | Genera preview |
-| `filekor sidecar <path>` | Genera archivo sidecar JSON |
-| `filekor batch <directory>` | Procesa directorio completo |
+| Command | Description |
+|---------|-------------|
+| `filekor extract <path>` | Extract text from file |
+| `filekor summarize <path>` | Generate summary (short by default) |
+| `filekor labels <path>` | Suggest labels |
+| `filekor preview <path>` | Generate preview |
+| `filekor sidecar <path>` | Generate sidecar JSON file |
+| `filekor batch <directory>` | Process complete directory |
 
 ---
 
-## Uso Detallado
+## Detailed Usage
 
 ### `filekor extract`
 
 ```bash
 filekor extract <path> [OPTIONS]
 
-# Extrae texto de un PDF
+# Extract text from a PDF
 filekor extract documento.pdf
 
-# Extrae a archivo específico
+# Extract to specific file
 filekor extract documento.pdf --output texto.txt
 
-# Formato de salida
+# Output format
 filekor extract documento.pdf --format json
 ```
 
 **Options:**
 
-| Flag | Descripción | Default |
+| Flag | Description | Default |
 |------|-------------|---------|
-| `--output, -o` | Archivo de salida | stdout |
-| `--format, -f` | Formato: text, json | text |
-| `--cache` | Usar caché si existe | False |
-| `--no-cache` | Forzar reprocesamiento | False |
+| `--output, -o` | Output file | stdout |
+| `--format, -f` | Format: text, json | text |
+| `--cache` | Use cache if exists | False |
+| `--no-cache` | Force reprocessing | False |
 
 ---
 
@@ -51,23 +51,23 @@ filekor extract documento.pdf --format json
 ```bash
 filekor summarize <path> [OPTIONS]
 
-# Resumen corto (default)
+# Short summary (default)
 filekor summarize documento.pdf
 
-# Resumen largo
+# Long summary
 filekor summarize documento.pdf --type long
 filekor summarize documento.pdf -t long
 
-# Guardar en archivo
+# Save to file
 filekor summarize documento.pdf --output resumen.txt
 ```
 
 **Options:**
 
-| Flag | Descripción | Default |
+| Flag | Description | Default |
 |------|-------------|---------|
-| `--type, -t` | Tipo: short, long | short |
-| `--output, -o` | Archivo de salida | stdout |
+| `--type, -t` | Type: short, long | short |
+| `--output, -o` | Output file | stdout |
 
 ---
 
@@ -76,14 +76,14 @@ filekor summarize documento.pdf --output resumen.txt
 ```bash
 filekor labels <path> [OPTIONS]
 
-# Sugerir etiquetas
+# Suggest labels
 filekor labels documento.pdf
 
-# Con confidence scores
+# With confidence scores
 filekor labels documento.pdf --show-confidence
 ```
 
-**Output ejemplo:**
+**Example output:**
 
 ```
 Suggested labels: contract, finance
@@ -100,25 +100,25 @@ Confidence:
 ```bash
 filekor preview <path> [OPTIONS]
 
-# Preview de archivo
+# File preview
 filekor preview documento.pdf
 
-# Preview con metadata
+# Preview with metadata
 filekor preview documento.pdf --show-metadata
 
-# Líneas limitadas
+# Limited lines
 filekor preview documento.pdf --lines 50
 ```
 
-**Output ejemplo:**
+**Example output:**
 
 ```
 File: contrato-proveedor-2026.pdf
 Size: 120 KB | Pages: 12 | Lang: es
 ----------------------------------------
 [Preview]
-Este contrato de servicios establece los términos y 
-condiciones para la provisión de servicios cloud...
+This service contract establishes the terms and
+conditions for cloud services provision...
 ----------------------------------------
 Labels: contract, provider
 Summary: Commercial annex with provider pricing...
@@ -131,19 +131,19 @@ Summary: Commercial annex with provider pricing...
 ```bash
 filekor sidecar <path> [OPTIONS]
 
-# Generar sidecar
+# Generate sidecar
 filekor sidecar documento.pdf
 
-# Directorio de salida
+# Output directory
 filekor sidecar documento.pdf --output ./metadata/
 
-# Forzar regeneration
+# Force regeneration
 filekor sidecar documento.pdf --no-cache
 ```
 
 **Output:**
 
-Genera `documento.kor` en el mismo directorio o en `--output`.
+Generates `documento.kor` in the same directory or in `--output`.
 
 ---
 
@@ -152,37 +152,37 @@ Genera `documento.kor` en el mismo directorio o en `--output`.
 ```bash
 filekor batch <directory> [OPTIONS]
 
-# Procesar directorio completo
+# Process complete directory
 filekor batch ./documentos/
 
-# Nivel de análisis
+# Analysis level
 filekor batch ./documentos/ --level fast
 
-# Solo archivos nuevos/modificados
+# Only new/modified files
 filekor batch ./documentos/ --incremental
 ```
 
 **Options:**
 
-| Flag | Descripción | Default |
+| Flag | Description | Default |
 |------|-------------|---------|
-| `--level, -l` | Nivel: minimal, fast, standard, deep | standard |
-| `--output, -o` | Directorio de salida | "." |
-| `--incremental` | Solo procesar cambios | False |
-| `--workers, -w` | Workers paralelos | 1 |
+| `--level, -l` | Level: minimal, fast, standard, deep | standard |
+| `--output, -o` | Output directory | "." |
+| `--incremental` | Only process changes | False |
+| `--workers, -w` | Parallel workers | 1 |
 
 ---
 
-## Flags Globales
+## Global Flags
 
-| Flag | Descripción | Default |
+| Flag | Description | Default |
 |------|-------------|---------|
-| `--help, -h` | Mostrar ayuda | - |
-| `--version, -v` | Mostrar versión | - |
-| `--verbose` | Output detallado | False |
-| `--quiet, -q` | Suprimir output | False |
-| `--config` | Archivo de config | ~/.filekor.yaml |
-| `--cache-dir` | Directorio de caché | ~/.filekor/cache |
+| `--help, -h` | Show help | - |
+| `--version, -v` | Show version | - |
+| `--verbose` | Detailed output | False |
+| `--quiet, -q` | Suppress output | False |
+| `--config` | Config file | ~/.filekor.yaml |
+| `--cache-dir` | Cache directory | ~/.filekor/cache |
 
 ---
 
@@ -213,16 +213,16 @@ filekor:
 
 ---
 
-## Niveles de Análisis (CLI)
+## Analysis Levels (CLI)
 
 ```bash
-# Solo hash (dup detection)
+# Only hash (dup detection)
 filekor batch ./docs --level minimal
 
-# Metadata rápida
+# Quick metadata
 filekor batch ./docs --level fast
 
-# Con embeddings
+# With embeddings
 filekor batch ./docs --level standard
 
 # Full LLM
@@ -231,34 +231,34 @@ filekor batch ./docs --level deep
 
 ---
 
-## Ejemplos de Uso
+## Usage Examples
 
 ```bash
-# 1. Escanear directorio por primera vez
+# 1. Scan directory for first time
 filekor batch ./proyecto/ --level standard
 
-# 2. Solo revisar archivos nuevos
+# 2. Only check new files
 filekor batch ./proyecto/ --incremental
 
-# 3. Preview rápido de un archivo
+# 3. Quick preview of a file
 filekor preview ./proyecto/contrato.pdf
 
-# 4. Generar todos los sidecars
+# 4. Generate all sidecars
 filekor batch ./proyecto/ --output ./proyecto/.filekor/
 
-# 5. Resumen largo bajo demanda
+# 5. Long summary on demand
 filekor summarize ./proyecto/doc.pdf --type long
 ```
 
 ---
 
-## Códigos de Salida
+## Exit Codes
 
-| Código | Significado |
-|--------|-------------|
-| 0 | Éxito |
-| 1 | Error general |
-| 2 | Error de argumentos |
-| 3 | Archivo no encontrado |
-| 4 | Caché corrupto |
-| 5 | Error de permisos |
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | Argument error |
+| 3 | File not found |
+| 4 | Corrupted cache |
+| 5 | Permission error |
